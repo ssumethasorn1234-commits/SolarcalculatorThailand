@@ -1,0 +1,12 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>เกี่ยวกับเรา และนโยบาย | Solar Calculator Thailand</title>
+<meta name="description" content="เกี่ยวกับ Solar Calculator Thailand นโยบายความเป็นส่วนตัว เงื่อนไขการใช้งาน และคุกกี้">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css"></head><body data-page="about"><div id="h"></div>
+<main class="w sec" style="max-width:760px"><h1 id="about">เกี่ยวกับเรา</h1>
+<p>Solar Calculator Thailand เป็นเครื่องมือฟรีช่วยเจ้าของบ้านศึกษาการติดตั้ง Solar เป็นเครื่องมือช่วยตัดสินใจ ไม่ใช่เครื่องมือขาย เราไม่ใช่ผู้ติดตั้งและใน Phase 1 ไม่ขาย Lead ผลลัพธ์ไม่ถูกปรับเพื่อผู้ลงโฆษณา</p>
+<h2 id="contact">ติดต่อ</h2><p>อีเมล: <span id="ce"></span></p>
+<h2 id="privacy">นโยบายความเป็นส่วนตัว (ฉบับร่าง)</h2>
+<ul><li>ใช้เครื่องคำนวณได้โดยไม่ต้องระบุชื่อหรือเบอร์โทร และไม่ต้องใช้ที่อยู่บ้านที่แน่นอน</li><li>คำตอบในเครื่องคำนวณและผลลัพธ์เก็บไว้ในเบราว์เซอร์ของคุณ (localStorage) เพื่อไม่ให้ข้อมูลหายเมื่อย้อนกลับหรือรีเฟรช</li><li>เก็บเฉพาะข้อมูลที่จำเป็นตามวัตถุประสงค์ และข้อมูลติดต่อเก็บเมื่อคุณส่งฟอร์มเองเท่านั้น</li><li>ผู้โฆษณาได้รับสถิติแบบรวมเท่านั้น ไม่ได้รับข้อมูลรายบุคคล</li><li>ขอเข้าถึงหรือลบข้อมูลได้ที่อีเมลติดต่อ</li></ul>
+<h2 id="terms">เงื่อนไขการใช้งาน (ฉบับร่าง)</h2><p>ผลลัพธ์เป็นประมาณการเบื้องต้น ไม่ใช่การออกแบบทางวิศวกรรม ใบเสนอราคา หรือการรับประกันผลประหยัด/ระยะคืนทุน กรุณาปรึกษาผู้ติดตั้งที่มีคุณสมบัติก่อนตัดสินใจ</p>
+<h2 id="cookie">คุกกี้และการติดตามการใช้งาน</h2><p>หากคุณกด "ยอมรับ" เราจะบันทึกเหตุการณ์การใช้งานแบบไม่ระบุตัวตน (เช่น ขั้นที่ดู ปุ่มที่กด) หากกด "ปฏิเสธ" จะไม่บันทึก <button class="btn g" id="rc">เปลี่ยนการตั้งค่า</button></p>
+<p class="note">ข้อความทางกฎหมายนี้เป็นฉบับร่าง ควรให้ผู้เชี่ยวชาญตรวจก่อนเปิดใช้งานจริง</p></main><div id="f"></div><script src="js/config.js"></script><script src="js/engine.js"></script><script src="js/common.js"></script><script>$("#ce").textContent=SOLAR_CONFIG.contactEmail;$("#rc").onclick=()=>{track("consent_update",{consent_type:"analytics",value:false});localStorage.removeItem("sc_consent");location.reload()}</script></body></html>

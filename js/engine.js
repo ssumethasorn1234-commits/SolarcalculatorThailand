@@ -1,0 +1,84 @@
+/* Calculation Engine — ไม่ผูกกับ UI ทดสอบด้วย node tests/run.js */
+(function(g){
+"use strict";
+const cl=(x,a,b)=>Math.min(b,Math.max(a,x));
+const f0=n=>Math.round(n).toLocaleString("th-TH");
+function regionOf(p,c){for(const r in c.regions)if(c.regions[r].split(",").includes(p))return r;return null}
+function calc(inp,cfg){
+ inp=inp||{};const goals=inp.goals||[],peaks=inp.peaks||[],loads=inp.loads||[];let unk=0;
+ const region=regionOf(inp.province,cfg);if(!region)unk++;
+ const Y=region?cfg.yield[region]:cfg.yieldDefault;
+ const billKnown=!inp.billUnknown&&+inp.bill>0;if(!billKnown)unk++;
+ const bill=billKnown?+inp.bill:cfg.defaultBill;
+ const E_month=+inp.kwh>0?+inp.kwh:bill/cfg.tariffAvg,E_day=E_month/30,E_year=E_month*12;
+ if(!inp.orient||inp.orient==="unknown")unk++;
+ if(!inp.shade||inp.shade==="unknown")unk++;
+ if(!inp.roofType||inp.roofType==="unknown")unk++;
+ const site=(cfg.orient[inp.orient]||cfg.orient.unknown)*(cfg.shade[inp.shade]||cfg.shade.unknown);
+ let sc=cfg.presence[inp.presence]||cfg.presence.some;
+ if(peaks.includes("day"))sc+=.05;
+ if(!peaks.includes("day")&&(peaks.includes("evening")||peaks.includes("night")))sc-=.05;
+ sc=cl(sc,.3,.85);
+ const pref=inp.pref||"unsure",needBackup=goals.includes("backup")||pref==="backup";
+ const nightHigh=(peaks.includes("evening")||peaks.includes("night"))&&sc<.7;
+ let batRec=needBackup?"recommended":(goals.includes("battery")||nightHigh)?"optional":(unk>=4?"unknown":"notneeded");
+ const useBat=pref==="ongrid"?false:(pref==="hybrid"||needBackup||(pref==="unsure"&&goals.includes("battery")));
+ const B=cfg.battery;let bat=0;
+ if(useBat){const need=needBackup?B.critKW*B.hours:E_day*(1-sc)*.5;bat=Math.max(B.min,Math.ceil(need/B.dod/B.eff/2.5)*2.5);}
+ const SC=useBat?Math.min(.95,sc+B.scBoost):sc;
+ const roofMax=+inp.roofArea>0?+inp.roofArea/cfg.m2PerKwp:cfg.maxKwp;
+ const over=goals.includes("export")?cfg.overGenExport:cfg.overGen;
+ let maxS=Math.min(cfg.maxKwp,roofMax,over*E_year/(Y*cfg.PR[1]*site));
+ maxS=Math.max(cfg.minKwp,Math.floor(maxS*2)/2);
+ const cap=+inp.budgetCap>0?+inp.budgetCap:0,exp=goals.includes("export"),rows=[];
+ for(let S=cfg.minKwp;S<=maxS+1e-9;S+=.5){
+  const gen=cfg.PR.map(p=>S*Y*p*site);
+  const ben=x=>Math.min(x*SC,E_year)*cfg.tariffEff+(exp?Math.max(x-Math.min(x*SC,E_year),0)*cfg.exportRate:0)-S*cfg.recurringPerKwp;
+  const benefit=gen.map(ben);
+  const cost=[0,1,2].map(i=>S*cfg.pricePerKwp[i]+cfg.bos[i]+(useBat?bat*cfg.battPerKwh[i]+cfg.hybridExtra[i]:0)+(needBackup?cfg.backupEquip[i]:0));
+  const self=Math.min(gen[1]*SC,E_year);
+  rows.push({S,gen,cost,benefit,savings:self*cfg.tariffEff,util:self/gen[1],
+   payback:benefit[1]>0?cost[1]/benefit[1]:null,
+   paybackRange:[benefit[2]>0?cost[0]/benefit[2]:null,benefit[0]>0?cost[2]/benefit[0]:null]});
+ }
+ const maxCost=Math.max(...rows.map(r=>r.cost[1])),maxSav=Math.max(...rows.map(r=>r.savings))||1;
+ const p=cl(+inp.priority||3,1,5),W={...cfg.w};W.budget+=(3-p)*.04;W.saving+=(p-3)*.04;
+ const tot=Object.values(W).reduce((a,b)=>a+b,0);for(const k in W)W[k]/=tot;
+ const maxG=goals.includes("max");
+ rows.forEach(r=>{
+  const bf=cap?Math.min(1,cap/r.cost[1]):1-.7*r.cost[1]/maxCost,sb=r.savings/maxSav;
+  const pf=r.payback==null?0:cl(1-(r.payback-3)/9,0,1),gf=maxG?sb:r.util;
+  r.score=Math.round(100*(W.budget*bf+W.saving*sb+W.payback*pf+W.usage*r.util+W.goal*gf));
+ });
+ const best=rows.reduce((a,b)=>b.score>a.score?b:a),max=rows[rows.length-1];
+ let bud;
+ if(cap){const ok=rows.filter(r=>r.cost[1]<=cap);bud=ok.length?ok[ok.length-1]:rows[0];}
+ if(!bud||bud.S>=best.S){const t=best.S*.6;bud=rows.reduce((a,b)=>Math.abs(b.S-t)<Math.abs(a.S-t)?b:a);}
+ const confidence=unk<=1?"high":unk<=3?"medium":"low";
+ const reasons=[
+  `ค่าไฟประมาณ ${f0(bill)} บาท/เดือน (ราว ${f0(E_month)} หน่วย) หรือใช้ไฟราว ${f0(E_year)} หน่วย/ปี`,
+  `ระบบ ${best.S} kWp ผลิตไฟได้ราว ${f0(best.gen[1])} หน่วย/ปี และคาดว่าใช้เองได้ราว ${Math.round(SC*100)}% ของที่ผลิต`,
+  best.payback?`คืนทุนประมาณ ${best.payback.toFixed(1)} ปี (ค่ากลาง) ได้คะแนนรวมสูงสุดจากงบ ผลประหยัด การคืนทุน และการใช้ไฟ`:"ข้อมูลนี้ยังประเมินการคืนทุนไม่ได้"];
+ if(site<.95)reasons.push("ทิศหลังคาหรือเงาบังทำให้ผลผลิตลดลงจากค่ามาตรฐาน");
+ if(roofMax<cfg.maxKwp&&+inp.roofArea>0)reasons.push(`พื้นที่หลังคาจำกัดขนาดระบบไม่เกินราว ${roofMax.toFixed(1)} kWp`);
+ if(pref==="ongrid"&&needBackup)reasons.push("คุณเลือก On-Grid แต่ต้องการไฟสำรอง ควรพิจารณา Hybrid หรือ Backup-focused");
+ if(cap&&best.cost[1]>cap)reasons.push("ราคาประมาณการของระบบแนะนำสูงกว่างบที่กำหนด ดูตัวเลือก Budget");
+ const assumptions=[
+  ["ผลผลิตต่อปี (Yield)",`${f0(Y)} kWh/kWp/ปี (${region||"ค่าเฉลี่ยประเทศ"})`],
+  ["Performance Ratio",cfg.PR.join(" / ")+` (ต่ำ/กลาง/สูง) × ปัจจัยหลังคา ${site.toFixed(2)}`],
+  ["อัตราค่าไฟเฉลี่ย (แปลงบิล→หน่วย)",`${cfg.tariffAvg} บาท/หน่วย`],
+  ["ค่าไฟที่ประหยัดได้",`${cfg.tariffEff} บาท/หน่วย`],
+  ["สัดส่วนใช้ไฟเอง (SC)",`${Math.round(SC*100)}%`],
+  ["ราคาติดตั้ง",`${f0(cfg.pricePerKwp[0])}–${f0(cfg.pricePerKwp[2])} บาท/kWp + ค่าอุปกรณ์ประกอบ`],
+  ["ค่าบำรุงรักษา",`${cfg.recurringPerKwp} บาท/kWp/ปี`]];
+ if(exp)assumptions.push(["ราคารับซื้อไฟส่วนเกิน",`${cfg.exportRate} บาท/หน่วย (ต้องตรวจสอบเงื่อนไขจริง)`]);
+ if(useBat)assumptions.push(["Battery",`${bat} kWh ระบุ (DoD ${B.dod}, ประสิทธิภาพ ${B.eff})`]);
+ const mk=r=>({...r});
+ return{meta:{calculation_version:cfg.calculation_version,assumption_set_version:cfg.assumption_set_version,generated_at:new Date().toISOString()},
+  system:useBat?(needBackup?"Backup-focused Hybrid":"Hybrid"):"On-Grid",useBat,batteryKwh:bat,batteryRec:batRec,
+  E_month,E_year,SC,region,weights:W,scenarios:{budget:mk(bud),best:mk(best),max:mk(max)},
+  confidence,reasons,assumptions};
+}
+const api={calc};
+if(typeof module!=="undefined")module.exports=api;else g.SolarEngine=api;
+})(typeof window!=="undefined"?window:globalThis);

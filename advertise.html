@@ -1,0 +1,35 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ลงโฆษณา | Solar Calculator Thailand</title>
+<meta name="description" content="ลงโฆษณากับ Solar Calculator Thailand เข้าถึงผู้สนใจ Solar ผ่านสถิติแบบรวม ไม่ส่งข้อมูลรายบุคคล">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css"></head><body data-page="advertise"><div id="h"></div>
+<main class="w sec" style="max-width:760px"><h1>ลงโฆษณากับ Solar Calculator Thailand</h1>
+<p>เข้าถึงผู้สนใจ Solar ด้วยสถิติแบบรวม (aggregate) เท่านั้น เราไม่ส่งข้อมูลรายบุคคลให้ผู้โฆษณา และโฆษณาไม่เปลี่ยนผลการคำนวณหรือคำแนะนำ ใน Phase 1 ยังไม่ขาย Lead</p>
+<p>รูปแบบ: แบนเนอร์หน้าแรก, ตำแหน่งในเครื่องคำนวณ/ผลลัพธ์, บทความสนับสนุน, โปรไฟล์บริษัท, โปรโมทสินค้า</p>
+<form id="af" class="card" novalidate><div class="hp"><label>อย่ากรอก <input name="website_hp" tabindex="-1" autocomplete="off"></label></div>
+<div class="field"><label for="company_name">ชื่อบริษัท *</label><input id="company_name" name="company_name" required></div>
+<div class="field"><label for="contact_name">ชื่อผู้ติดต่อ *</label><input id="contact_name" name="contact_name" required></div>
+<div class="field"><label for="phone">โทรศัพท์ *</label><input id="phone" name="phone" type="tel" required></div>
+<div class="field"><label for="email">อีเมล *</label><input id="email" name="email" type="email" required></div>
+<div class="field"><label for="website">เว็บไซต์</label><input id="website" name="website" type="url" placeholder="https://"></div>
+<div class="field"><label for="business_type">ประเภทธุรกิจ *</label><select id="business_type" name="business_type" required><option value="">เลือก</option><option>ผู้ติดตั้ง Solar</option><option>ผู้จำหน่ายอุปกรณ์</option><option>สถาบันการเงิน/สินเชื่อ</option><option>อื่น ๆ</option></select></div>
+<div class="field"><label>รูปแบบโฆษณาที่สนใจ *</label><div class="opts"><label class="opt"><input type="checkbox" name="ad_formats" value="banner"><span>แบนเนอร์หน้าแรก</span></label><label class="opt"><input type="checkbox" name="ad_formats" value="result"><span>ตำแหน่งในผลลัพธ์</span></label><label class="opt"><input type="checkbox" name="ad_formats" value="article"><span>บทความสนับสนุน</span></label><label class="opt"><input type="checkbox" name="ad_formats" value="profile"><span>โปรไฟล์บริษัท</span></label><label class="opt"><input type="checkbox" name="ad_formats" value="product"><span>โปรโมทสินค้า</span></label></div></div>
+<div class="field"><label for="budget_range">งบโฆษณาโดยประมาณ</label><select id="budget_range" name="budget_range"><option value="">ไม่ระบุ</option><option>ต่ำกว่า 10,000 บาท/เดือน</option><option>10,000–50,000</option><option>มากกว่า 50,000</option></select></div>
+<div class="field"><label for="message">ข้อความ</label><textarea id="message" name="message" rows="3"></textarea></div>
+<div class="field"><label class="chk"><input type="checkbox" name="marketing_consent"> ยินยอมให้ติดต่อข้อมูลข่าวสารเพิ่มเติม (ไม่บังคับ แยกจากการติดต่อเรื่องคำขอนี้) </label></div>
+<p class="note">ข้อมูลนี้ใช้เพื่อติดต่อกลับเรื่องการโฆษณาเท่านั้น อ่าน <a href="about.html#privacy">นโยบายความเป็นส่วนตัว</a></p>
+<p class="err" id="ae" role="alert"></p><button class="btn" type="submit">ส่งข้อมูล</button></form><p id="ok" class="card" hidden></p></main><div id="f"></div><script src="js/config.js"></script><script src="js/engine.js"></script><script src="js/common.js"></script><script>
+track("advertise_view",{source:document.referrer?"referral":"direct"});
+const af=$("#af");let started=false;
+af.addEventListener("input",()=>{if(!started){started=true;track("advertiser_form_start",{session_id:SID})}});
+af.addEventListener("submit",async e=>{e.preventDefault();const fd=new FormData(af),o=Object.fromEntries(fd.entries());
+ o.ad_formats=fd.getAll("ad_formats");o.marketing_consent=!!fd.get("marketing_consent");
+ if(o.website_hp)return;delete o.website_hp;
+ const need=["company_name","contact_name","phone","email","business_type"];
+ if(need.some(k=>!String(o[k]||"").trim())||!o.ad_formats.length||!/^\S+@\S+\.\S+$/.test(o.email)){$("#ae").textContent="กรอกช่องที่มี * ให้ครบ เลือกรูปแบบโฆษณาอย่างน้อย 1 ข้อ และตรวจอีเมลให้ถูกต้อง";return}
+ $("#ae").textContent="";o.id=crypto.randomUUID();o.created_at=new Date().toISOString();o.status="new";
+ let sent=false;
+ if(SOLAR_CONFIG.formEndpoint){try{const r=await fetch(SOLAR_CONFIG.formEndpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(o)});sent=r.ok}catch(_){}}
+ if(!sent){const q=LS.get("sc_adv_leads",[]);q.push(o);LS.set("sc_adv_leads",q)}
+ track("advertiser_form_submit",{advertiser_lead_id:o.id});af.hidden=true;const k=$("#ok");k.hidden=false;
+ k.textContent=sent?"ส่งข้อมูลแล้ว ขอบคุณ เราจะติดต่อกลับ":"บันทึกข้อมูลแล้ว (เวอร์ชันทดสอบยังไม่เชื่อมระบบรับฟอร์ม) กรุณาติดต่อ "+SOLAR_CONFIG.contactEmail+" ด้วย"});
+</script></body></html>
