@@ -28,7 +28,8 @@ af.addEventListener("submit",async e=>{e.preventDefault();const fd=new FormData(
  if(need.some(k=>!String(o[k]||"").trim())||!o.ad_formats.length||!/^\S+@\S+\.\S+$/.test(o.email)){$("#ae").textContent="กรอกช่องที่มี * ให้ครบ เลือกรูปแบบโฆษณาอย่างน้อย 1 ข้อ และตรวจอีเมลให้ถูกต้อง";return}
  $("#ae").textContent="";o.id=crypto.randomUUID();o.created_at=new Date().toISOString();o.status="new";
  let sent=false;
- if(SOLAR_CONFIG.formEndpoint){try{const r=await fetch(SOLAR_CONFIG.formEndpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(o)});sent=r.ok}catch(_){}}
+ const ep=SOLAR_CONFIG.formEndpoint||SOLAR_CONFIG.analyticsEndpoint;
+ if(ep){try{await fetch(ep,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(o)});sent=true}catch(_){}}
  if(!sent){const q=LS.get("sc_adv_leads",[]);q.push(o);LS.set("sc_adv_leads",q)}
  track("advertiser_form_submit",{advertiser_lead_id:o.id});af.hidden=true;const k=$("#ok");k.hidden=false;
  k.textContent=sent?"ส่งข้อมูลแล้ว ขอบคุณ เราจะติดต่อกลับ":"บันทึกข้อมูลแล้ว (เวอร์ชันทดสอบยังไม่เชื่อมระบบรับฟอร์ม) กรุณาติดต่อ "+SOLAR_CONFIG.contactEmail+" ด้วย"});

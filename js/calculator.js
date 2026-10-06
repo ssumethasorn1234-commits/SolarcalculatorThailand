@@ -87,7 +87,8 @@ function results(){
  <section class="pg"><details><summary>สมมติฐานที่ใช้คำนวณ</summary><table id="as"></table><p class="note">ค่าทั้งหมดเป็นประมาณการเบื้องต้น เวอร์ชัน ${C.calculation_version} / ${C.assumption_set_version}</p></details></section>
  <section class="pg card"><h3>ดาวน์โหลด</h3><p><a class="btn" id="dr" href="report.html">Solar Report (PDF)</a> <a class="btn g" id="dc2" href="report.html?type=checklist">Installation Checklist</a></p><p class="note">เปิดรายงานแล้วกด 'บันทึกเป็น PDF' (Thai font ถูกต้อง ไม่ต้องติดตั้งอะไรเพิ่ม)</p>
  <button class="btn g" id="edit">แก้ไขคำตอบ</button></section>`;
- track("calculator_complete",{session_id:SID,result_id:"local",calculation_version:C.calculation_version});track("result_view",{session_id:SID,result_id:"local"});
+ const bs=base.scenarios.best,band=(v,a)=>{for(const x of a)if(v<x)return"<"+x;return">="+a[a.length-1]};
+ track("calculator_complete",{session_id:SID,result_id:"local",calculation_version:C.calculation_version,region:base.region||"unknown",system_type:base.system,size_kwp:bs.S,size_band:band(bs.S,[3,5,10]),budget_band:band(bs.cost[1],[100000,200000,400000]),goals:(S.goals||[]).join("|"),confidence:base.confidence});track("result_view",{session_id:SID,result_id:"local"});
  paint();window.scrollTo(0,0);
  $("#bs").oninput=e=>{touched=true;const v=+e.target.value;$("#bv").textContent=fmt(v);cur=E.calc({...S,budgetCap:v},C);paint(v)};
  $("#bs").onchange=e=>track("budget_change",{session_id:SID,old_budget:+S.budgetCap||0,new_budget:+e.target.value});

@@ -12,7 +12,7 @@ const regions={
  S:"ชุมพร,ระนอง,สุราษฎร์ธานี,นครศรีธรรมราช,กระบี่,พังงา,ภูเก็ต,สงขลา,สตูล,ตรัง,พัทลุง,ปัตตานี,ยะลา,นราธิวาส"};
 return{
  calculation_version:"v1.0.0", assumption_set_version:"TH-2026-01-DRAFT",
- analyticsEndpoint:"",   // ใส่ URL ของ Backend/API เมื่อพร้อม (ว่าง = เก็บในเครื่องผู้ใช้เท่านั้น)
+ analyticsEndpoint:"https://script.google.com/macros/s/AKfycbwYx3DVwYU-y9LRpp9XiPO8VvLkEWz1hIRFGAc5-u2MH_lbFzMx2jhUr8oGIAA8x9Gy/exec",   // ใส่ URL ของ Backend/API เมื่อพร้อม (ว่าง = เก็บในเครื่องผู้ใช้เท่านั้น)
  formEndpoint:"",        // URL รับฟอร์มลงโฆษณา (ว่าง = เก็บในเครื่อง)
  contactEmail:"hello@example.com",
  regions, provinces:Object.values(regions).join(",").split(",").sort((a,b)=>a.localeCompare(b,"th")),

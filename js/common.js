@@ -15,7 +15,8 @@ window.track=function(name,payload){
  if(LS.get("sc_consent")!=="granted")return;
  const ev={id:uid(),anonymous_id:aid,session_id:sid,event_name:name,event_time:new Date().toISOString(),page_path:location.pathname,payload_json:payload||{}};
  const q=LS.get("sc_events",[]);q.push(ev);LS.set("sc_events",q.slice(-300));
- if(C.analyticsEndpoint&&navigator.sendBeacon)navigator.sendBeacon(C.analyticsEndpoint,JSON.stringify(ev));
+ if(C.analyticsEndpoint){const body=JSON.stringify(ev);
+  try{fetch(C.analyticsEndpoint,{method:"POST",mode:"no-cors",keepalive:true,headers:{"Content-Type":"text/plain;charset=utf-8"},body}).catch(()=>{})}catch(e){}}
 };
 const page=document.body.dataset.page||"page";
 document.title=document.title||"Solar Calculator Thailand";
