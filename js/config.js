@@ -12,9 +12,9 @@ const regions={
  S:"ชุมพร,ระนอง,สุราษฎร์ธานี,นครศรีธรรมราช,กระบี่,พังงา,ภูเก็ต,สงขลา,สตูล,ตรัง,พัทลุง,ปัตตานี,ยะลา,นราธิวาส"};
 return{
  calculation_version:"v1.0.0", assumption_set_version:"TH-2026-01-DRAFT",
- analyticsEndpoint:"https://script.google.com/macros/s/AKfycbwYx3DVwYU-y9LRpp9XiPO8VvLkEWz1hIRFGAc5-u2MH_lbFzMx2jhUr8oGIAA8x9Gy/exec",   // ใส่ URL ของ Backend/API เมื่อพร้อม (ว่าง = เก็บในเครื่องผู้ใช้เท่านั้น)
+ analyticsEndpoint:"https://script.google.com/macros/s/AKfycbxQovqoXaAQRYATszl_m10Tz-jXZy56d1Nen4_QTWT_iJh3rEPvOpA3ysMg5y96WmY3/exec",   // ใส่ URL ของ Backend/API เมื่อพร้อม (ว่าง = เก็บในเครื่องผู้ใช้เท่านั้น)
  formEndpoint:"",        // URL รับฟอร์มลงโฆษณา (ว่าง = เก็บในเครื่อง)
- contactEmail:"hello@example.com",
+ contactEmail:"solarcalculatorthai@gmail.com",
  regions, provinces:Object.values(regions).join(",").split(",").sort((a,b)=>a.localeCompare(b,"th")),
  yield:{BKK:1350,C:1380,N:1400,NE:1420,E:1380,W:1400,S:1330}, yieldDefault:1380, // kWh/kWp/ปี
  PR:[.74,.80,.84],                 // low, mid, high
