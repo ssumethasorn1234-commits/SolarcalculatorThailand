@@ -12,7 +12,7 @@ const regions={
  S:"ชุมพร,ระนอง,สุราษฎร์ธานี,นครศรีธรรมราช,กระบี่,พังงา,ภูเก็ต,สงขลา,สตูล,ตรัง,พัทลุง,ปัตตานี,ยะลา,นราธิวาส"};
 return{
  calculation_version:"v1.0.0", assumption_set_version:"TH-2026-01-DRAFT",
- analyticsEndpoint:"https://script.google.com/macros/s/AKfycbwYdeeaSPdhqbYgckBpGWHOdMrmW6D5I-lQ2HGMZTBmC91iKwxhEKdKwUvpaazSna6r/exec",   // ใส่ URL ของ Backend/API เมื่อพร้อม (ว่าง = เก็บในเครื่องผู้ใช้เท่านั้น)
+ analyticsEndpoint:"https://script.google.com/macros/s/AKfycbxTDkpbqZMlU3-FfLXy10SNyaIbfRosSqzHTBZA_dbVJrBI5sBYxeUHdXHzzzRCBNcD/exec",   // ใส่ URL ของ Backend/API เมื่อพร้อม (ว่าง = เก็บในเครื่องผู้ใช้เท่านั้น)
  formEndpoint:"",        // URL รับฟอร์มลงโฆษณา (ว่าง = เก็บในเครื่อง)
  contactEmail:"solarcalculatorthai@gmail.com",
  regions, provinces:Object.values(regions).join(",").split(",").sort((a,b)=>a.localeCompare(b,"th")),
